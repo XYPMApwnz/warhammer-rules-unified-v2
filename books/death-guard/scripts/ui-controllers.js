@@ -12,15 +12,28 @@
       this.clear.addEventListener('click',()=>this.reset());
     }
     showAll(){this.cards.forEach(card=>{card.hidden=false;card.style.order='';});this.empty.hidden=true;}
-    apply(){
-      const query=this.input.value.trim().toLocaleLowerCase();
-      if(!query){const top=this.origin;this.origin=null;this.showAll();if(top!==null)window.scrollTo({top,behavior:'smooth'});return;}
-      if(this.origin===null)this.origin=window.scrollY;
+    filter(query){
       let shown=0;
       this.cards.forEach(card=>{const title=card.dataset.glossaryTitle.toLocaleLowerCase(),visible=title.includes(query);card.hidden=!visible;card.style.order=title===query?'-1':'';if(visible)shown++;});
       this.empty.hidden=shown!==0;
     }
+    apply(){
+      const query=this.input.value.trim().toLocaleLowerCase();
+      if(!query){const top=this.origin;this.origin=null;this.showAll();if(top!==null)window.scrollTo({top,behavior:'smooth'});return;}
+      if(this.origin===null)this.origin=window.scrollY;
+      this.filter(query);
+    }
     reset(){const top=this.origin;this.input.value='';this.origin=null;this.showAll();this.input.focus({preventScroll:true});if(top!==null)window.scrollTo({top,behavior:'smooth'});}
+    snapshot(){return{query:this.input.value,origin:this.origin};}
+    restore(state){
+      this.input.value=state?.query||'';this.origin=state?.origin??null;
+      const query=this.input.value.trim().toLocaleLowerCase();if(query)this.filter(query);else this.showAll();
+    }
+    reveal(target){
+      const card=target?.matches?.('[data-glossary-title]')?target:target?.closest?.('[data-glossary-title]');
+      if(!card?.hidden)return false;
+      this.input.value='';this.origin=null;this.showAll();return true;
+    }
   }
 
   class ThemeController{
@@ -43,7 +56,7 @@
       for(const table of document.querySelectorAll('.weapon-table[role="table"]')){
         const rows=[...table.querySelectorAll('.weapon-row')];
         table.setAttribute('aria-colcount','7');table.setAttribute('aria-rowcount',String(rows.length));
-        rows.forEach((row,rowIndex)=>[...row.children].forEach((cell,columnIndex)=>cell.setAttribute('role',rowIndex===0?'columnheader':columnIndex===0?'rowheader':'cell')));
+        rows.forEach((row,rowIndex)=>{row.setAttribute('role','row');[...row.children].forEach((cell,columnIndex)=>cell.setAttribute('role',rowIndex===0?'columnheader':columnIndex===0?'rowheader':'cell'));});
       }
     }
   }

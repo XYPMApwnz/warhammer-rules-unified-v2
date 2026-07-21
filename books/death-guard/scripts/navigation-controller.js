@@ -14,6 +14,12 @@
       this.mobile=window.innerWidth<=this.breakpoint;
       this.state={owner:'reader',active:'',drawer:false,collapsed:false,transition:0};
       this.frame=0;
+      this.metricsFrame=0;
+      this.metrics=[];
+      this.headerBottom=0;
+      this.glossaryToolsHeight=0;
+      this.activeButtons=new Set();
+      this.supportsInert='inert'in HTMLElement.prototype;
       this.items=[...this.tree.querySelectorAll('[data-nav-id]')].map(node=>{
         const button=[...node.children].find(child=>child.classList.contains('toc-row'))?.querySelector('[data-nav-target]');
         const id=button?.dataset.navTarget||'';
@@ -22,9 +28,9 @@
       this.byId=new Map(this.items.map(item=>[item.id,item]));
       this.bind();
       this.closeAll();
-      this.setCollapsed(false);
-      this.setDrawer(false);
-      this.readViewport();
+      this.setCollapsed(false,{force:true});
+      this.refreshMetrics();
+      if('ResizeObserver'in window){this.layoutObserver=new ResizeObserver(()=>this.scheduleMetrics());this.layoutObserver.observe(this.main);}
     }
 
     get active(){return this.state.active||'start';}
@@ -50,7 +56,12 @@
       this.scrim.addEventListener('click',()=>this.setDrawer(false));
       window.addEventListener('scroll',()=>this.scheduleRead(),{passive:true});
       window.addEventListener('resize',()=>this.onResize(),{passive:true});
+      window.addEventListener('wheel',()=>this.cancelControlledScroll(),{passive:true});
+      window.addEventListener('touchstart',()=>this.cancelControlledScroll(),{passive:true});
+      window.addEventListener('pointerdown',()=>this.cancelControlledScroll(),{passive:true});
       document.addEventListener('keydown',event=>{
+        if(['PageUp','PageDown','Home','End','ArrowUp','ArrowDown',' '].includes(event.key))this.cancelControlledScroll();
+        if(event.key==='Tab'&&this.state.drawer)this.trapDrawerFocus(event);
         if(event.key==='Escape'&&this.state.drawer&&!document.querySelector('#popupLayer .term-popup'))this.setDrawer(false);
       });
     }
@@ -58,16 +69,25 @@
     closeAll(){for(const item of this.items)this.closeBranch(item.node);}
     closeBranch(node){
       const branch=this.branch(node),toggle=this.toggle(node);
+      if(branch?.hidden&&toggle?.getAttribute('aria-expanded')==='false')return;
       if(branch)branch.hidden=true;
       if(toggle)toggle.setAttribute('aria-expanded','false');
       if(branch)for(const child of branch.children)if(child.matches('[data-nav-id]'))this.closeBranch(child);
     }
     openBranch(node){
       const branch=this.branch(node),toggle=this.toggle(node);if(!branch||!toggle)return;
+      if(!branch.hidden&&toggle.getAttribute('aria-expanded')==='true')return;
       for(const peer of node.parentElement.children)if(peer!==node&&peer.matches('[data-nav-id]'))this.closeBranch(peer);
       branch.hidden=false;toggle.setAttribute('aria-expanded','true');
     }
     toggleBranch(node){const branch=this.branch(node);if(branch)(branch.hidden?this.openBranch(node):this.closeBranch(node));}
+    trapDrawerFocus(event){
+      const controls=[...this.panel.querySelectorAll('a,button,input,select,textarea,[tabindex]')].filter(control=>control.tabIndex>=0&&!control.closest('[hidden]'));
+      if(!controls.length)return;
+      const first=controls[0],last=controls[controls.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
     revealPath(node){
       const parents=[];for(let parent=this.parentNode(node);parent;parent=this.parentNode(parent))parents.unshift(parent);
       for(const parent of parents)this.openBranch(parent);
@@ -75,7 +95,7 @@
     }
 
     setInteractive(root,interactive){
-      root.inert=!interactive;
+      if(this.supportsInert){root.inert=!interactive;return;}
       for(const control of root.querySelectorAll('a,button,input,select,textarea,[tabindex]')){
         const key='data-nav-saved-tabindex';
         if(!interactive&&!control.hasAttribute(key)){
@@ -95,18 +115,21 @@
       if(blocked)this.main.setAttribute('aria-hidden','true');else this.main.removeAttribute('aria-hidden');
       this.scrim.setAttribute('aria-hidden',String(!this.state.drawer));
     }
-    setDrawer(open){
+    setDrawer(open,{force=false}={}){
+      const next=this.mobile&&Boolean(open);if(!force&&next===this.state.drawer)return;
       const returnFocus=this.state.drawer&&this.panel.contains(document.activeElement);
-      this.state.drawer=this.mobile&&Boolean(open);
+      this.state.drawer=next;
       document.body.classList.toggle('nav-drawer-open',this.state.drawer);
       this.menuButton.setAttribute('aria-expanded',String(this.state.drawer));
       this.menuButton.setAttribute('aria-label',this.state.drawer?'Close navigation':'Open navigation');
       this.syncVisibility();
-      if(returnFocus&&!this.state.drawer)this.menuButton.focus({preventScroll:true});
+      if(this.state.drawer){requestAnimationFrame(()=>this.panel.querySelector('[data-nav-target]')?.focus({preventScroll:true}));}
+      else if(returnFocus)this.menuButton.focus({preventScroll:true});
     }
-    setCollapsed(collapsed){
+    setCollapsed(collapsed,{force=false}={}){
+      const next=this.mobile?false:Boolean(collapsed);if(!force&&next===this.state.collapsed)return;
       const returnFocus=!this.state.collapsed&&this.panel.contains(document.activeElement);
-      this.state.collapsed=this.mobile?false:Boolean(collapsed);
+      this.state.collapsed=next;
       document.body.classList.toggle('nav-collapsed',this.state.collapsed);
       this.collapseButton.setAttribute('aria-expanded',String(!this.state.collapsed));
       this.collapseButton.setAttribute('aria-label',this.state.collapsed?'Expand navigation':'Collapse navigation');
@@ -116,30 +139,35 @@
     }
     onResize(){
       const mobile=window.innerWidth<=this.breakpoint;
-      if(mobile!==this.mobile){this.mobile=mobile;if(mobile)this.setCollapsed(false);this.setDrawer(false);}
-      this.syncVisibility();this.scheduleRead();
+      if(mobile!==this.mobile){this.mobile=mobile;this.setCollapsed(false,{force:true});this.setDrawer(false);}
+      this.scheduleMetrics();
     }
 
-    select(id,{reveal=true}={}){
+    select(id,{reveal=true,behavior='auto'}={}){
       const selected=this.byId.get(id);if(!selected)return;
+      const nextButtons=new Set([selected.button]);
+      for(let parent=this.parentNode(selected.node);parent;parent=this.parentNode(parent)){
+        const button=this.row(parent)?.querySelector('[data-nav-target]');if(button)nextButtons.add(button);
+      }
+      for(const button of this.activeButtons)if(!nextButtons.has(button)){button.classList.remove('is-current','is-ancestor');button.removeAttribute('aria-current');}
       this.state.active=id;
-      for(const item of this.items){item.button.classList.remove('is-current','is-ancestor');item.button.removeAttribute('aria-current');}
+      selected.button.classList.remove('is-ancestor');
       selected.button.classList.add('is-current');selected.button.setAttribute('aria-current','location');
-      for(let parent=this.parentNode(selected.node);parent;parent=this.parentNode(parent))this.row(parent)?.querySelector('[data-nav-target]')?.classList.add('is-ancestor');
+      for(const button of nextButtons)if(button!==selected.button){button.classList.remove('is-current');button.classList.add('is-ancestor');button.removeAttribute('aria-current');}
+      this.activeButtons=nextButtons;
       this.revealPath(selected.node);
-      if(reveal)this.keepVisible(this.row(selected.node));
+      if(reveal)this.keepVisible(this.row(selected.node),behavior);
     }
-    keepVisible(row){
-      if(!row||this.panel.inert)return;
+    keepVisible(row,behavior='auto'){
+      if(!row||this.panel.inert||this.panel.getAttribute('aria-hidden')==='true')return;
       const panel=this.panel.getBoundingClientRect(),item=row.getBoundingClientRect(),gap=12;
-      if(item.top<panel.top+gap)this.panel.scrollTo({top:this.panel.scrollTop-(panel.top+gap-item.top),behavior:'smooth'});
-      else if(item.bottom>panel.bottom-gap)this.panel.scrollTo({top:this.panel.scrollTop+(item.bottom-panel.bottom+gap),behavior:'smooth'});
+      if(item.top<panel.top+gap)this.panel.scrollTo({top:this.panel.scrollTop-(panel.top+gap-item.top),behavior});
+      else if(item.bottom>panel.bottom-gap)this.panel.scrollTo({top:this.panel.scrollTop+(item.bottom-panel.bottom+gap),behavior});
     }
 
     trackingGap(){return 18;}
     stickyClearance(element){
-      const glossaryTools=element.id!=='glossary'&&element.closest?.('#glossary')?document.querySelector('.glossary-tools'):null;
-      return glossaryTools?.getBoundingClientRect().height||0;
+      return element.id!=='glossary'&&element.closest?.('#glossary')?(this.glossaryToolsHeight||0):0;
     }
     destination(element){
       return Math.max(0,window.scrollY+element.getBoundingClientRect().top-this.header.getBoundingClientRect().height-this.trackingGap()-this.stickyClearance(element));
@@ -160,7 +188,7 @@
     navigate(id,element,settled){this.controlledScroll(id,this.destination(element),()=>{this.highlight(element);if(settled)settled();});}
     restore(id,scrollY,settled){this.controlledScroll(id,Math.max(0,scrollY),settled);}
     controlledScroll(id,destination,settled){
-      const token=++this.state.transition;this.state.owner='controller';this.select(id);
+      const token=++this.state.transition;this.state.owner='controller';this.select(id,{behavior:'smooth'});
       window.scrollTo({top:destination,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
       this.waitForSettle(destination,token,settled);
     }
@@ -177,14 +205,33 @@
       requestAnimationFrame(inspect);
     }
 
+    cancelControlledScroll(){
+      if(this.state.owner!=='controller')return;
+      this.state.transition++;this.state.owner='reader';this.scheduleRead();
+    }
+
     scheduleRead(){if(this.state.owner!=='reader'||this.frame)return;this.frame=requestAnimationFrame(()=>{this.frame=0;this.readViewport();});}
+    scheduleMetrics(){if(this.metricsFrame)return;this.metricsFrame=requestAnimationFrame(()=>{this.metricsFrame=0;this.refreshMetrics();});}
+    refreshMetrics(){
+      const scrollY=window.scrollY;
+      this.headerBottom=this.header.getBoundingClientRect().bottom;
+      this.glossaryToolsHeight=document.querySelector('.glossary-tools')?.getBoundingClientRect().height||0;
+      this.metrics=this.items.map(item=>{const rect=item.section.getBoundingClientRect();return{item,top:scrollY+rect.top,bottom:scrollY+rect.bottom};});
+      this.readViewport();
+    }
     readViewport(){
       if(this.state.owner!=='reader')return;
-      const baseLine=this.header.getBoundingClientRect().bottom+18;
-      const measured=this.items.map(item=>({item,rect:item.section.getBoundingClientRect(),line:baseLine+this.stickyClearance(item.section)+1}));
-      let winner=measured.filter(value=>value.rect.top<=value.line&&value.rect.bottom>value.line)
-        .sort((a,b)=>b.item.depth-a.item.depth||b.rect.top-a.rect.top)[0]||null;
-      if(!winner)winner=measured.filter(value=>value.rect.top<=value.line).sort((a,b)=>b.rect.top-a.rect.top||b.item.depth-a.item.depth)[0]||measured[0];
+      const baseLine=window.scrollY+this.headerBottom+18;
+      let winner=null;
+      for(const value of this.metrics){
+        const line=baseLine+this.stickyClearance(value.item.section)+1;
+        if(value.top<=line&&value.bottom>line&&(!winner||value.item.depth>winner.item.depth||value.item.depth===winner.item.depth&&value.top>winner.top))winner=value;
+      }
+      if(!winner)for(const value of this.metrics){
+        const line=baseLine+this.stickyClearance(value.item.section)+1;
+        if(value.top<=line&&(!winner||value.top>winner.top||value.top===winner.top&&value.item.depth>winner.item.depth))winner=value;
+      }
+      winner=winner||this.metrics[0];
       if(winner&&winner.item.id!==this.state.active)this.select(winner.item.id);
     }
   }

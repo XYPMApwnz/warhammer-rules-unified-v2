@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "warhammer-rules-unified-v2-";
-const CACHE_NAME = `${CACHE_PREFIX}v1`;
+const CACHE_NAME = `${CACHE_PREFIX}v2`;
 const LIBRARY_FALLBACK = "./index.html";
 const DEATH_GUARD_FALLBACK = "./books/death-guard/index.html";
 const APP_SHELL = [
@@ -27,17 +27,17 @@ const APP_SHELL = [
   "./books/death-guard/",
   DEATH_GUARD_FALLBACK,
   "./books/death-guard/assets/icon-v4.svg",
-  "./books/death-guard/styles/tokens.css",
-  "./books/death-guard/styles/layout.css",
-  "./books/death-guard/styles/navigation.css",
-  "./books/death-guard/styles/content.css",
-  "./books/death-guard/styles/popups.css",
-  "./books/death-guard/scripts/data.js",
-  "./books/death-guard/scripts/navigation-controller.js",
-  "./books/death-guard/scripts/popup-controller.js",
-  "./books/death-guard/scripts/journey-controller.js",
-  "./books/death-guard/scripts/ui-controllers.js",
-  "./books/death-guard/scripts/app.js"
+  "./books/death-guard/styles/tokens.css?v=2",
+  "./books/death-guard/styles/layout.css?v=2",
+  "./books/death-guard/styles/navigation.css?v=2",
+  "./books/death-guard/styles/content.css?v=2",
+  "./books/death-guard/styles/popups.css?v=2",
+  "./books/death-guard/scripts/data.js?v=2",
+  "./books/death-guard/scripts/navigation-controller.js?v=2",
+  "./books/death-guard/scripts/popup-controller.js?v=2",
+  "./books/death-guard/scripts/journey-controller.js?v=2",
+  "./books/death-guard/scripts/ui-controllers.js?v=2",
+  "./books/death-guard/scripts/app.js?v=2"
 ];
 
 self.addEventListener("install", (event) => {
