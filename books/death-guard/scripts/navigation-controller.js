@@ -92,19 +92,18 @@
     openBranch(node){
       const branch=this.branch(node),toggle=this.toggle(node);if(!branch)return;
       if(branch.hidden){
-        for(const peer of node.parentElement.children)if(peer!==node&&peer.matches('[data-nav-id]')&&!this.isOnActivePath(peer))this.closeBranch(peer,{deep:true});
+        for(const peer of node.parentElement.children)if(peer!==node&&peer.matches('[data-nav-id]'))this.closeBranch(peer,{deep:true});
         branch.hidden=false;
       }
       if(toggle)toggle.setAttribute('aria-expanded','true');
     }
-    isOnActivePath(node){
-      const active=this.byId.get(this.state.active)?.node;
-      for(let current=active;current;current=this.parentNode(current))if(current===node)return true;
-      return false;
-    }
     toggleBranch(node){
       const branch=this.branch(node);if(!branch)return;
-      if(branch.hidden)this.openBranch(node);else if(!this.isOnActivePath(node))this.closeBranch(node,{deep:true});
+      if(branch.hidden)this.openBranch(node);else this.closeBranch(node,{deep:true});
+    }
+    pathIsOpen(node){
+      for(let current=node;current;current=this.parentNode(current))if(this.branch(current)?.hidden)return false;
+      return true;
     }
     revealPath(node,{includeSelf=false}={}){
       const path=[];for(let parent=this.parentNode(node);parent;parent=this.parentNode(parent))path.unshift(parent);
@@ -241,7 +240,9 @@
     }
     readViewport(){
       if(this.state.owner!=='reader')return;
-      const item=this.pickActive();if(item&&item.id!==this.state.active)this.activate(item.id);
+      const item=this.pickActive();
+      if(item&&item.id!==this.state.active)this.activate(item.id);
+      else if(item&&!this.pathIsOpen(item.node))this.revealPath(item.node,{includeSelf:true});
     }
 
     highlightElement(element){
