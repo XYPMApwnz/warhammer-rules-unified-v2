@@ -60,7 +60,8 @@ body {
     radial-gradient(circle at 8% 32%, rgba(125, 146, 87, .15), transparent 28rem),
     var(--underhive);
   background-size: 42px 42px, 42px 42px, auto, auto, auto, auto;
-  font: var(--body-size)/1.55 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: var(--body-size)/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
 }
 body::before {
   content: "";

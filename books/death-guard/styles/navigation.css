@@ -34,7 +34,7 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
   margin: 0 8px 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid var(--bronze);
-  font: 600 26px Georgia, "Times New Roman", serif;
+  font: 700 26px Georgia, "Times New Roman", serif;
   letter-spacing: -.025em;
 }
 .toc-heading::after {
@@ -76,7 +76,7 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
 .toc-label {
   padding: 8px 10px;
   text-align: left;
-  font-weight: 650;
+  font-weight: 720;
 }
 .toc-toggle::after {
   content: "›";

@@ -44,7 +44,7 @@
   background: var(--faction-gradient);
 }
 .term-popup:nth-last-child(n+4) { visibility: hidden; pointer-events: none; }
-.term-popup h3 { margin: 0 0 8px; font: 600 24px Georgia, "Times New Roman", serif; }
+.term-popup h3 { margin: 0 0 8px; font: 700 24px Georgia, "Times New Roman", serif; }
 .term-popup p { margin: 7px 0; color: var(--muted); }
 .popup-close {
   position: absolute;

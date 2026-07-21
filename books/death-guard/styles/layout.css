@@ -50,7 +50,7 @@ html[data-theme="light"] .app-header { background: rgba(231, 223, 202, .95); }
   position: relative;
   min-width: 0;
   padding-left: 38px;
-  font: 600 19px/1 Georgia, "Times New Roman", serif;
+  font: 700 19px/1 Georgia, "Times New Roman", serif;
   letter-spacing: -.025em;
   white-space: nowrap;
   overflow: hidden;
