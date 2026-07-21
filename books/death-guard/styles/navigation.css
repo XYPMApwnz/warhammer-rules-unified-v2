@@ -7,9 +7,11 @@
   overflow: auto;
   overscroll-behavior: contain;
   background:
+    radial-gradient(circle at 30px 42px, rgba(125,146,87,.16), transparent 110px),
+    linear-gradient(160deg, transparent 0 42%, rgba(213,72,142,.045) 70%, transparent),
     linear-gradient(rgba(183,166,125,.022) 1px, transparent 1px),
     rgba(13,15,13,.96);
-  background-size: 42px 42px, auto;
+  background-size: auto, auto, 42px 42px, auto;
   border-right: 1px solid var(--line);
   box-shadow: 18px 0 40px rgba(0,0,0,.22);
   transition: transform .2s ease;
@@ -19,9 +21,18 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
 .toc-heading {
   margin: 0 8px 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--bronze);
   font: 600 26px Georgia, "Times New Roman", serif;
   letter-spacing: -.025em;
+}
+.toc-heading::after {
+  content: "";
+  display: block;
+  width: 54px;
+  height: 3px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, var(--green) 0 66%, var(--pink) 66%);
+  box-shadow: 0 0 14px rgba(125,146,87,.18);
 }
 .toc-heading::before {
   content: "CODEX REGISTER // XIV";
@@ -68,7 +79,7 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
 .toc-label.is-current {
   color: var(--green);
   background: linear-gradient(90deg, rgba(113,129,83,.18), rgba(196,59,127,.06) 68%, transparent);
-  box-shadow: inset 3px 0 var(--green-deep), inset 5px 0 var(--pink);
+  box-shadow: inset 3px 0 var(--green), inset 6px 0 var(--pink), inset 0 1px rgba(199,174,117,.12), inset 0 -1px rgba(199,174,117,.08);
 }
 body.nav-collapsed .toc-panel { transform: translateX(-102%); }
 .toc-scrim { display: none; }

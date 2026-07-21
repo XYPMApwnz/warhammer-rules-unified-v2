@@ -7,7 +7,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(13, 15, 13, .94);
+  background:
+    linear-gradient(90deg, rgba(125,146,87,.1), transparent 32%, rgba(213,72,142,.07)),
+    rgba(13, 15, 13, .96);
   border-bottom: 1px solid var(--line);
   box-shadow: 0 10px 34px rgba(0,0,0,.28);
   backdrop-filter: blur(15px);
@@ -44,12 +46,30 @@ html[data-theme="light"] .app-header { background: rgba(231, 223, 202, .95); }
 }
 .library-link span { color: var(--pink); font-size: 18px; }
 .app-brand {
+  position: relative;
   min-width: 0;
+  padding-left: 38px;
   font: 600 19px/1 Georgia, "Times New Roman", serif;
   letter-spacing: -.025em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.app-brand::before {
+  content: "XIV";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  translate: 0 -50%;
+  border: 1px solid var(--bronze);
+  background: radial-gradient(circle, rgba(125,146,87,.24), rgba(13,15,13,.9));
+  color: var(--green);
+  font: 800 8px ui-monospace, monospace;
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.22), 0 0 18px rgba(125,146,87,.12);
 }
 .app-brand small {
   display: block;
@@ -88,7 +108,8 @@ body.nav-collapsed .main { padding-left: clamp(28px, 5vw, 72px); }
 @media (max-width: 480px) {
   .app-header { gap: 7px; padding-left: 8px; padding-right: 8px; }
   .header-button { min-width: 40px; }
-  .app-brand { font-size: 14px; }
+  .app-brand { padding-left: 31px; font-size: 14px; }
+  .app-brand::before { width: 24px; height: 24px; font-size: 7px; }
   .app-brand small { display: none; }
   .library-link { width: 40px; min-width: 40px; padding: 0; justify-content: center; }
   .library-link b { display: none; }

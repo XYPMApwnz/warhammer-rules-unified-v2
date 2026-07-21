@@ -4,20 +4,20 @@
   --nav: 310px;
   --bg: #0d0f0d;
   --underhive: #121512;
-  --panel: #1a1e1b;
-  --panel-2: #232824;
-  --ink: #d8d1bf;
+  --panel: #191f1a;
+  --panel-2: #252c25;
+  --ink: #e2dcc9;
   --muted: #969589;
-  --green: #afc583;
-  --green-deep: #718153;
-  --bronze: #756849;
-  --bronze-bright: #b7a67d;
-  --pink: #c43b7f;
+  --green: #bfd58c;
+  --green-deep: #7d9257;
+  --bronze: #8d7448;
+  --bronze-bright: #c7ae75;
+  --pink: #d5488e;
   --pink-deep: #74143f;
   --line: rgba(216, 209, 191, .14);
   --soft-line: rgba(216, 209, 191, .08);
   --glass: rgba(26, 30, 27, .94);
-  --shadow: 0 26px 58px rgba(0, 0, 0, .46);
+  --shadow: 0 26px 58px rgba(0, 0, 0, .46), 0 0 0 1px rgba(0, 0, 0, .48);
   --radius: 2px;
   --body-size: 17px;
   --data-size: 14px;
@@ -50,12 +50,13 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(rgba(183, 166, 125, .024) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(183, 166, 125, .018) 1px, transparent 1px),
-    radial-gradient(circle at 84% 7%, rgba(196, 59, 127, .13), transparent 30rem),
-    radial-gradient(circle at 8% 32%, rgba(113, 129, 83, .11), transparent 28rem),
+    linear-gradient(rgba(183, 166, 125, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(183, 166, 125, .028) 1px, transparent 1px),
+    repeating-linear-gradient(135deg, transparent 0 96px, rgba(183,166,125,.018) 97px 99px, transparent 100px 192px),
+    radial-gradient(circle at 84% 7%, rgba(213, 72, 142, .17), transparent 30rem),
+    radial-gradient(circle at 8% 32%, rgba(125, 146, 87, .15), transparent 28rem),
     var(--underhive);
-  background-size: 42px 42px, 42px 42px, auto, auto, auto;
+  background-size: 42px 42px, 42px 42px, auto, auto, auto, auto;
   font: var(--body-size)/1.55 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 body::before {
@@ -77,8 +78,11 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
   position: relative;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(255,255,255,.025), transparent 34%), var(--glass);
-  box-shadow: var(--shadow), inset 0 1px rgba(255,255,255,.025);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.045), transparent 22%),
+    linear-gradient(315deg, rgba(141,116,72,.055), transparent 34%),
+    var(--glass);
+  box-shadow: var(--shadow), inset 0 1px rgba(255,255,255,.04), inset 0 -1px rgba(0,0,0,.48);
 }
 .surface::before {
   content: "";
