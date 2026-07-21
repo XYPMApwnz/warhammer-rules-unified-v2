@@ -115,6 +115,7 @@ try{
 
 check('Journey captures full popup context',journey.includes('popupIds:this.popups.snapshot()')&&journey.includes('popupRootId')&&journey.includes('popupAction'));
 check('Back restores before highlighting rebuilt action',journey.indexOf('this.popups.restore(record.popupIds')<journey.indexOf('this.highlight(restoredPopup||trigger)'));
+check('Back restores popup before scrolling to prevent flicker',journey.indexOf('this.popups.restore(record.popupIds')<journey.indexOf('this.navigation.restore(record.navId'));
 check('Back has rebuilt-action fallback',journey.includes('this.findRestoredAction(record.popupAction)'));
 check('Back highlights the restored popup card',journey.includes("trigger?.closest?.('.term-popup')")&&journey.includes('this.highlight(restoredPopup||trigger)'));
 

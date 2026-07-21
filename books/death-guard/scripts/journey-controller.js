@@ -56,9 +56,10 @@
     back(){
       const record=this.history.pop();if(!record)return;
       this.backButton.hidden=this.history.length===0;
+      const popupRoot=document.getElementById(record.popupRootId||record.triggerId);
+      this.popups.restore(record.popupIds,{root:popupRoot,focus:false});
       this.navigation.restore(record.navId,record.scrollY,()=>{
-        const popupRoot=document.getElementById(record.popupRootId||record.triggerId);
-        this.popups.restore(record.popupIds,{root:popupRoot,focus:false});
+        this.popups.reposition();
         const trigger=document.getElementById(record.triggerId)||this.findRestoredAction(record.popupAction);
         const restoredPopup=trigger?.closest?.('.term-popup');
         this.highlight(restoredPopup||trigger);
