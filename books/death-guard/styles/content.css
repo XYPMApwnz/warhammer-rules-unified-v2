@@ -233,7 +233,6 @@
 .glossary-card[hidden], .no-results[hidden] { display: none; }
 .destination-highlight { animation: destination-card-highlight 2.3s ease; }
 .destination-highlight:is(h1,h2,h3,h4,h5,h6) { animation-name: destination-heading-highlight; }
-.destination-highlight > :is(.section-title, .category-title) { animation: destination-heading-highlight 2.3s ease; }
 @keyframes destination-card-highlight {
   0%, 100% { outline-color: transparent; filter: none; }
   16%, 72% {

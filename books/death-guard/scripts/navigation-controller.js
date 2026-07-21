@@ -145,7 +145,11 @@
       return Math.max(0,window.scrollY+element.getBoundingClientRect().top-this.header.getBoundingClientRect().height-this.trackingGap()-this.stickyClearance(element));
     }
     highlightElement(element){
-      return element;
+      if(element.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem,.hero'))return element;
+      const directHeading=[...element.children].find(child=>child.matches?.('.section-title,.category-title'));
+      if(directHeading)return directHeading;
+      const directCard=[...element.children].find(child=>child.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem'));
+      return directCard||element;
     }
     highlight(element){
       const target=this.highlightElement(element);if(!target)return;
