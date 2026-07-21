@@ -83,10 +83,10 @@ html[data-theme="light"] .app-header { background: rgba(231, 223, 202, .95); }
 .nav-menu { display: none; }
 .main {
   min-height: 100vh;
-  padding: calc(var(--header) + env(safe-area-inset-top) + 34px) clamp(24px, 4vw, 58px) 90px calc(var(--nav) + clamp(30px, 4vw, 62px));
+  padding: calc(var(--header) + env(safe-area-inset-top) + 34px) clamp(24px, 4vw, 58px) 90px calc(var(--nav-gutter) + var(--nav) + var(--content-gap));
   transition: padding-left .2s ease;
 }
-.document { max-width: 1040px; margin: auto; }
+.document { max-width: 1100px; margin: auto; counter-reset: archive-section; }
 body.nav-collapsed .main { padding-left: clamp(28px, 5vw, 72px); }
 .footer {
   margin-top: 78px;

@@ -1,7 +1,9 @@
 :root {
   color-scheme: dark;
   --header: 70px;
-  --nav: 310px;
+  --nav: 286px;
+  --nav-gutter: clamp(16px, 2vw, 28px);
+  --content-gap: clamp(20px, 2.4vw, 38px);
   --bg: #0d0f0d;
   --underhive: #121512;
   --panel: #191f1a;
