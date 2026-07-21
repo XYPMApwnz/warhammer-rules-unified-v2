@@ -146,7 +146,7 @@
     }
     highlightElement(element){
       if(element.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem,.hero'))return element;
-      const directHeading=[...element.children].find(child=>child.matches?.('.section-title,.category-title'));
+      const directHeading=[...element.children].find(child=>child.matches?.('.section-title,.category-title,.detachment-part-title')||/^H[1-6]$/.test(child.tagName||''));
       if(directHeading)return directHeading;
       const directCard=[...element.children].find(child=>child.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem'));
       return directCard||element;
@@ -180,14 +180,11 @@
     scheduleRead(){if(this.state.owner!=='reader'||this.frame)return;this.frame=requestAnimationFrame(()=>{this.frame=0;this.readViewport();});}
     readViewport(){
       if(this.state.owner!=='reader')return;
-      const line=this.header.getBoundingClientRect().bottom+18;
-      const measured=this.items.map(item=>({item,rect:item.section.getBoundingClientRect()}));
-      let winner=measured.filter(value=>value.rect.top<=line&&value.rect.bottom>line)
+      const baseLine=this.header.getBoundingClientRect().bottom+18;
+      const measured=this.items.map(item=>({item,rect:item.section.getBoundingClientRect(),line:baseLine+this.stickyClearance(item.section)+1}));
+      let winner=measured.filter(value=>value.rect.top<=value.line&&value.rect.bottom>value.line)
         .sort((a,b)=>b.item.depth-a.item.depth||b.rect.top-a.rect.top)[0]||null;
-      const approaching=measured.filter(value=>value.rect.top>line&&value.rect.top<=line+56)
-        .sort((a,b)=>a.rect.top-b.rect.top||b.item.depth-a.item.depth)[0]||null;
-      if(approaching&&(!winner||approaching.item.depth>winner.item.depth))winner=approaching;
-      if(!winner)winner=measured.filter(value=>value.rect.top<=line).sort((a,b)=>b.rect.top-a.rect.top||b.item.depth-a.item.depth)[0]||measured[0];
+      if(!winner)winner=measured.filter(value=>value.rect.top<=value.line).sort((a,b)=>b.rect.top-a.rect.top||b.item.depth-a.item.depth)[0]||measured[0];
       if(winner&&winner.item.id!==this.state.active)this.select(winner.item.id);
     }
   }
