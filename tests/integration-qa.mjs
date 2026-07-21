@@ -36,12 +36,12 @@ check('Death Guard exposes an explicit library link',book.includes('class="libra
 check('Death Guard delegates to the root service worker',app.includes("register('../../service-worker.js')"));
 check('no nested service worker or manifest is shipped',!exists('books/death-guard/service-worker.js')&&!exists('books/death-guard/manifest.webmanifest'));
 check('unified v2 cache prefix is isolated',sw.includes('warhammer-rules-unified-v2-')&&!sw.includes('const CACHE_PREFIX = "warhammer-rules-"'));
-check('unified cache revision is current',sw.includes('`${CACHE_PREFIX}v3`'));
+check('unified cache revision is current',sw.includes('`${CACHE_PREFIX}v4`'));
 check('navigation responses are cached under their own URL',sw.includes('fetchAndCache(request);')&&!sw.includes('fetchAndCache(request, LIBRARY_FALLBACK)'));
 check('Death Guard has a dedicated offline fallback',sw.includes('DEATH_GUARD_FALLBACK')&&sw.includes('/books/death-guard/'));
-const versionedBookFile=file=>/\.(css|js)$/.test(file)?`"./${file}?v=3"`:`"./${file}"`;
+const versionedBookFile=file=>/\.(css|js)$/.test(file)?`"./${file}?v=4"`:`"./${file}"`;
 check('every book shell file is precached',bookFiles.every(file=>sw.includes(versionedBookFile(file))||file==='books/death-guard/index.html'&&sw.includes('DEATH_GUARD_FALLBACK')),bookFiles.filter(file=>!sw.includes(versionedBookFile(file))&&!(file==='books/death-guard/index.html'&&sw.includes('DEATH_GUARD_FALLBACK'))).join(', '));
-check('book shell assets use release-versioned URLs',bookFiles.filter(file=>/\.(css|js)$/.test(file)).every(file=>book.includes(`./${file.replace('books/death-guard/','')}?v=3`)));
+check('book shell assets use release-versioned URLs',bookFiles.filter(file=>/\.(css|js)$/.test(file)).every(file=>book.includes(`./${file.replace('books/death-guard/','')}?v=4`)));
 
 for(const result of results)console.log(`${result.ok?'PASS':'FAIL'}  ${result.name}${result.detail?' — '+result.detail:''}`);
 const failed=results.filter(result=>!result.ok);
