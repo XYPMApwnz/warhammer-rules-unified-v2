@@ -90,14 +90,19 @@ try{
     const enhancementClasses=new Set(),enhancement={offsetWidth:300,matches:selector=>selector.split(',').includes('.enhancement'),children:[heading],classList:{add:name=>enhancementClasses.add(name),remove:name=>enhancementClasses.delete(name)}};
     controller.highlight(enhancement);
     check('behavior: Enhancement highlights the complete card',enhancementClasses.has('destination-highlight'));
-    let selected='';globalThis.window.scrollY=0;controller.state={owner:'reader',active:''};controller.items=[{id:'parent',depth:1,glossaryNested:false},{id:'child',depth:2,glossaryNested:false}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:120,bottom:300}];controller.activate=id=>{selected=id};controller.readViewport();
+    const parentNode={};
+    const childNode={parentElement:{classList:{contains:name=>name==='toc-branch'},parentElement:parentNode}};
+    const nextNode={parentElement:{classList:{contains:name=>name==='toc-branch'},parentElement:parentNode}};
+    let selected='';globalThis.window.scrollY=0;controller.state={owner:'reader',active:''};controller.items=[{id:'parent',depth:1,glossaryNested:false,node:parentNode},{id:'child',depth:2,glossaryNested:false,node:childNode}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:120,bottom:300}];controller.activate=id=>{selected=id};controller.readViewport();
     check('behavior: child below tracking line does not pre-activate',selected==='parent',selected);
     selected='';controller.geometry.ranges[1]={item:controller.items[1],top:90.5,bottom:300};controller.readViewport();
     check('behavior: subpixel target at tracking line activates',selected==='child',selected);
-    selected='';controller.items=[{id:'glossary',depth:1,glossaryNested:false},{id:'glossary-core',depth:2,glossaryNested:true}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:154.5,bottom:300}];controller.readViewport();
+    selected='';controller.items=[{id:'glossary',depth:1,glossaryNested:false,node:parentNode},{id:'glossary-core',depth:2,glossaryNested:true,node:childNode}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:154.5,bottom:300}];controller.readViewport();
     check('behavior: nested Glossary group uses sticky tracking line',selected==='glossary-core',selected);
-    selected='';controller.items=[{id:'glossary',depth:1,glossaryNested:false},{id:'glossary-core',depth:2,glossaryNested:true},{id:'glossary-next',depth:2,glossaryNested:true}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:700},{item:controller.items[1],top:100,bottom:145},{item:controller.items[2],top:180,bottom:320}];controller.readViewport();
+    selected='';controller.items=[{id:'glossary',depth:1,glossaryNested:false,node:parentNode},{id:'glossary-core',depth:2,glossaryNested:true,node:childNode},{id:'glossary-next',depth:2,glossaryNested:true,node:nextNode}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:700},{item:controller.items[1],top:100,bottom:145},{item:controller.items[2],top:180,bottom:320}];controller.readViewport();
     check('behavior: Glossary root does not flash between nested groups',selected==='glossary-core',selected);
+    selected='';controller.items=[{id:'datasheets',depth:1,glossaryNested:false,node:parentNode},{id:'epic-heroes',depth:2,glossaryNested:false,node:childNode},{id:'characters',depth:2,glossaryNested:false,node:nextNode}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:700},{item:controller.items[1],top:40,bottom:80},{item:controller.items[2],top:130,bottom:320}];controller.readViewport();
+    check('behavior: parent does not flash between non-Glossary groups',selected==='epic-heroes',selected);
   }finally{
     if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;
     if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;
@@ -163,6 +168,8 @@ check('click navigation highlights only after controlled scroll settles',navigat
 const cssFiles=['styles/tokens.css','styles/layout.css','styles/navigation.css','styles/content.css','styles/popups.css'];
 check('all five style layers are linked',cssFiles.every(file=>html.includes('href="./'+file+'?v=3"')));
 const contentCss=read('styles/content.css');
+const navigationCss=read('styles/navigation.css');
+check('navigation hides horizontal overflow and styles its scrollbar',/\.toc-panel\s*\{[^}]*overflow-x:\s*hidden/.test(navigationCss)&&navigationCss.includes('.toc-panel::-webkit-scrollbar-thumb')&&navigationCss.includes('scrollbar-color:'));
 check('datasheet statlines keep all seven characteristics on one row',/\.statline\s*\{[^}]*grid-template-columns:\s*repeat\(7,minmax\(0,1fr\)\)/.test(contentCss));
 check('heading destination highlight uses text glow without outline',/\.destination-highlight:is\(h1,h2,h3,h4,h5,h6\)\s*\{[^}]*animation-name:\s*destination-heading-highlight/.test(contentCss)&&contentCss.includes('@keyframes destination-heading-highlight')&&!contentCss.match(/@keyframes destination-heading-highlight[^}]*outline/));
 check('detachment navigation targets render in separate rows',/\.detachment-content\s*\{[^}]*grid-template-columns:\s*1fr/.test(contentCss));

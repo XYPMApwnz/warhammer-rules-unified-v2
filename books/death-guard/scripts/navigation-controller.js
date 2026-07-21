@@ -212,22 +212,26 @@
       });
       this.readViewport();
     }
+    descendsFrom(item,ancestor){
+      for(let node=this.parentNode(item.node);node;node=this.parentNode(node))if(node===ancestor.node)return true;
+      return false;
+    }
+    lastCrossedDescendant(parent,scrollY){
+      let descendant=null;
+      for(const range of this.geometry.ranges){
+        if(!this.descendsFrom(range.item,parent.item))continue;
+        const line=scrollY+this.geometry.headerBottom+this.trackingGap+this.clearance(range.item);
+        if(range.top<=line+this.epsilon&&(!descendant||range.top>descendant.top||range.top===descendant.top&&range.item.depth>descendant.item.depth))descendant=range;
+      }
+      return descendant;
+    }
     pickActive(){
       const scrollY=window.scrollY;let winner=null;
       for(const range of this.geometry.ranges){
         const line=scrollY+this.geometry.headerBottom+this.trackingGap+this.clearance(range.item);
         if(range.top<=line+this.epsilon&&range.bottom>line&&(!winner||range.item.depth>winner.item.depth||range.item.depth===winner.item.depth&&range.top>winner.top))winner=range;
       }
-      if(winner?.item.id==='glossary'){
-        let glossaryWinner=null;
-        for(const range of this.geometry.ranges){
-          if(!range.item.glossaryNested)continue;
-          const line=scrollY+this.geometry.headerBottom+this.trackingGap+this.clearance(range.item);
-          if(range.top<=line+this.epsilon&&(!glossaryWinner||range.top>glossaryWinner.top))glossaryWinner=range;
-        }
-        if(glossaryWinner)return glossaryWinner.item;
-      }
-      if(winner)return winner.item;
+      if(winner)return this.lastCrossedDescendant(winner,scrollY)?.item||winner.item;
       for(const range of this.geometry.ranges){
         const line=scrollY+this.geometry.headerBottom+this.trackingGap+this.clearance(range.item);
         if(range.top<=line+this.epsilon&&(!winner||range.top>winner.top||range.top===winner.top&&range.item.depth>winner.item.depth))winner=range;

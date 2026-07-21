@@ -4,8 +4,11 @@
   inset: calc(var(--header) + env(safe-area-inset-top) + 18px) auto 18px var(--nav-gutter);
   width: var(--nav);
   padding: 24px 14px 44px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(157,175,111,.72) rgba(7,10,7,.72);
   background:
     radial-gradient(circle at 30px 42px, rgba(125,146,87,.16), transparent 110px),
     linear-gradient(160deg, transparent 0 42%, rgba(213,72,142,.045) 70%, transparent),
@@ -17,6 +20,18 @@
   box-shadow: 18px 18px 46px rgba(0,0,0,.32), inset 0 0 0 6px rgba(0,0,0,.16);
   transition: transform .2s ease;
 }
+.toc-panel::-webkit-scrollbar { width: 10px; }
+.toc-panel::-webkit-scrollbar-track {
+  background: rgba(7,10,7,.72);
+  border-left: 1px solid rgba(199,174,117,.12);
+}
+.toc-panel::-webkit-scrollbar-thumb {
+  min-height: 54px;
+  border: 2px solid rgba(7,10,7,.72);
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(157,175,111,.82), rgba(141,116,72,.78));
+}
+.toc-panel::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--green), var(--bronze-bright)); }
 .toc-panel::after {
   content: "";
   position: absolute;
@@ -63,6 +78,7 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
   gap: 2px;
   margin: 2px 0;
   border-radius: 0;
+  min-width: 0;
 }
 .toc-row.no-toggle { grid-template-columns: 1fr; }
 .toc-label, .toc-toggle {
@@ -74,7 +90,9 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
   cursor: pointer;
 }
 .toc-label {
+  min-width: 0;
   padding: 8px 10px;
+  overflow-wrap: anywhere;
   text-align: left;
   font-weight: 720;
 }
