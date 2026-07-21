@@ -56,40 +56,44 @@ const journey=read('scripts/journey-controller.js');
 check('navigation uses one passive scroll listener',(navigation.match(/addEventListener\('scroll'/g)||[]).length===1&&navigation.includes('{passive:true}'));
 check('navigation avoids :scope',!navigation.includes(':scope'));
 check('navigation has explicit reader/controller ownership',navigation.includes("owner:'reader'")&&navigation.includes("owner='controller'")&&navigation.includes("owner='reader'"));
-const settleSource=navigation.match(/waitForSettle\([\s\S]*?\n    scheduleRead/)?.[0]||'';
-check('navigation settles by geometry instead of fixed delay',settleSource.includes('stable>=6')&&settleSource.includes('Math.abs(current-destination)<2')&&!settleSource.includes('setTimeout'));
-check('mobile breakpoint clears collapsed state',navigation.includes('this.setCollapsed(false,{force:true})'));
+const settleSource=navigation.match(/waitForSettle\([\s\S]*?\n    cancelTransition/)?.[0]||'';
+check('navigation settles by geometry instead of fixed delay',settleSource.includes('stable>=6')&&settleSource.includes('Math.abs(current-destination)<2')&&settleSource.includes('Date.now()-started>2200')&&!settleSource.includes('setTimeout'));
+check('mobile breakpoint clears collapsed state',navigation.includes('if(mobile)this.state.collapsed=false'));
 check('native inert avoids the full tabindex walk',navigation.includes("this.supportsInert='inert'in HTMLElement.prototype")&&navigation.includes('if(this.supportsInert){root.inert=!interactive;return;}'));
 check('tabindex fallback remains available for legacy browsers',navigation.includes('data-nav-saved-tabindex'));
-check('unchanged drawer state is a no-op',navigation.includes("if(!force&&next===this.state.drawer)return"));
+check('unchanged drawer state is a no-op',navigation.includes('if(next===this.state.drawer)return'));
 const readViewportSource=navigation.match(/readViewport\(\)\{[\s\S]*?\n    \}/)?.[0]||'';
 check('scroll spy performs no layout measurements per frame',!readViewportSource.includes('getBoundingClientRect'));
-check('user input cancels controlled scrolling',navigation.includes('cancelControlledScroll()')&&navigation.includes("window.addEventListener('touchstart'"));
+check('user input cancels controlled scrolling',navigation.includes('cancelTransition()')&&navigation.includes("window.addEventListener('touchstart'"));
+check('active navigation path cannot be collapsed',navigation.includes('isOnActivePath(node)')&&navigation.includes('else if(!this.isOnActivePath(node))this.closeBranch'));
+check('branch labels and arrows have separate actions',navigation.includes("event.target.closest('[data-nav-toggle]')")&&navigation.includes("event.target.closest('[data-nav-target]')"));
 const navigationClassSource=navigation.match(/(class NavigationController\{[\s\S]*?\n  \})\n\n  window\.DGNavigation/)?.[1]||'';
 try{
   const NavigationController=Function(`"use strict";return (${navigationClassSource});`)();
   const controller=Object.create(NavigationController.prototype);
-  controller.header={getBoundingClientRect:()=>({height:72})};
-  controller.glossaryToolsHeight=64;
+  controller.trackingGap=18;
+  controller.epsilon=1;
+  controller.geometry={headerBottom:72,glossaryHeight:64,ranges:[]};
+  controller.byId=new Map();
   const previousWindow=globalThis.window,previousDocument=globalThis.document;
   try{
     globalThis.window={scrollY:1000,setTimeout:()=>0};
     globalThis.document={querySelector:()=>null};
-    const glossaryTarget={closest:selector=>selector==='#glossary'?{}:null,getBoundingClientRect:()=>({top:200})};
+    const glossaryTarget={id:'term',dataset:{},closest:selector=>selector==='#glossary'?{}:null,getBoundingClientRect:()=>({top:200})};
     check('behavior: glossary destination clears sticky search',controller.destination(glossaryTarget)===1046,String(controller.destination(glossaryTarget)));
-    const glossaryRoot={id:'glossary',closest:selector=>selector==='#glossary'?{}:null,getBoundingClientRect:()=>({top:200})};
+    const glossaryRoot={id:'glossary',dataset:{},closest:selector=>selector==='#glossary'?{}:null,getBoundingClientRect:()=>({top:200})};
     check('behavior: Glossary root ignores its own sticky search',controller.destination(glossaryRoot)===1110,String(controller.destination(glossaryRoot)));
-    const classes=new Set(),heading={tagName:'H3',offsetWidth:80,classList:{add:name=>classes.add(name),remove:name=>classes.delete(name)}};
+    const classes=new Set(),heading={tagName:'H3',offsetWidth:80,classList:{contains:name=>classes.has(name),add:name=>classes.add(name),remove:name=>classes.delete(name)}};
     const section={matches:()=>false,children:[heading]};controller.highlight(section);
     check('behavior: click destination highlights its direct heading',classes.has('destination-highlight'));
     const enhancementClasses=new Set(),enhancement={offsetWidth:300,matches:selector=>selector.split(',').includes('.enhancement'),children:[heading],classList:{add:name=>enhancementClasses.add(name),remove:name=>enhancementClasses.delete(name)}};
     controller.highlight(enhancement);
     check('behavior: Enhancement highlights the complete card',enhancementClasses.has('destination-highlight'));
-    let selected='';globalThis.window.scrollY=0;controller.state={owner:'reader',active:''};controller.headerBottom=72;controller.items=[{id:'parent',depth:1,section:{}},{id:'child',depth:2,section:{}}];controller.metrics=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:120,bottom:300}];controller.select=id=>{selected=id};controller.readViewport();
+    let selected='';globalThis.window.scrollY=0;controller.state={owner:'reader',active:''};controller.items=[{id:'parent',depth:1,glossaryNested:false},{id:'child',depth:2,glossaryNested:false}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:120,bottom:300}];controller.activate=id=>{selected=id};controller.readViewport();
     check('behavior: child below tracking line does not pre-activate',selected==='parent',selected);
-    selected='';controller.metrics[1]={item:controller.items[1],top:90.5,bottom:300};controller.readViewport();
+    selected='';controller.geometry.ranges[1]={item:controller.items[1],top:90.5,bottom:300};controller.readViewport();
     check('behavior: subpixel target at tracking line activates',selected==='child',selected);
-    selected='';controller.items=[{id:'glossary',depth:1,section:{id:'glossary',closest:()=>({})}},{id:'glossary-core',depth:2,section:{id:'glossary-core',closest:selector=>selector==='#glossary'?{}:null}}];controller.metrics=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:154.5,bottom:300}];controller.readViewport();
+    selected='';controller.items=[{id:'glossary',depth:1,glossaryNested:false},{id:'glossary-core',depth:2,glossaryNested:true}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:154.5,bottom:300}];controller.readViewport();
     check('behavior: nested Glossary group uses sticky tracking line',selected==='glossary-core',selected);
   }finally{
     if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;
@@ -144,15 +148,15 @@ try{
 }catch(error){check('popup behavioral state machine',false,error.message);}
 
 check('Journey captures full popup context',journey.includes('popupIds:this.popups.snapshot()')&&journey.includes('popupRootId')&&journey.includes('popupAction'));
-check('Journey preserves and reveals filtered glossary targets',journey.includes('glossaryState=this.glossary?.snapshot')&&journey.includes("target.closest?.('#glossary')")&&journey.includes('this.glossary?.reveal?.(target)'));
+check('Journey synchronously reveals filtered glossary targets',journey.includes("target.closest?.('#glossary')")&&journey.includes('this.glossary?.reveal?.(target)'));
 const backSource=journey.match(/back\(\)\{[\s\S]*?\n    \}/)?.[0]||'';
 check('Back restores before highlighting rebuilt action',backSource.indexOf('this.popups.restore(record.popupIds')<backSource.indexOf('this.highlight(restoredPopup||trigger)'));
-check('Back restores glossary and popups before scrolling',backSource.indexOf('this.glossary?.restore')<backSource.indexOf('this.popups.restore')&&backSource.indexOf('this.popups.restore')<backSource.indexOf('this.navigation.restore'));
+check('Back restores popups only after navigation settles',backSource.indexOf('this.navigation.restore')<backSource.indexOf('this.popups.restore(record.popupIds'));
 check('Back has rebuilt-action fallback',journey.includes('this.findRestoredAction(record.popupAction)'));
-check('click navigation highlights only after controlled scroll settles',navigation.includes("()=>{this.highlight(element);if(settled)settled();}"));
+check('click navigation highlights only after controlled scroll settles',navigation.includes("()=>{this.highlight(element);settled?.();}"));
 
 const cssFiles=['styles/tokens.css','styles/layout.css','styles/navigation.css','styles/content.css','styles/popups.css'];
-check('all five style layers are linked',cssFiles.every(file=>html.includes('href="./'+file+'?v=2"')));
+check('all five style layers are linked',cssFiles.every(file=>html.includes('href="./'+file+'?v=3"')));
 const contentCss=read('styles/content.css');
 check('heading destination highlight uses text glow without outline',/\.destination-highlight:is\(h1,h2,h3,h4,h5,h6\)\s*\{[^}]*animation-name:\s*destination-heading-highlight/.test(contentCss)&&contentCss.includes('@keyframes destination-heading-highlight')&&!contentCss.match(/@keyframes destination-heading-highlight[^}]*outline/));
 check('detachment navigation targets render in separate rows',/\.detachment-content\s*\{[^}]*grid-template-columns:\s*1fr/.test(contentCss));
@@ -164,8 +168,8 @@ check('weapon rows receive explicit table semantics',read('scripts/ui-controller
 check('mobile header disables expensive backdrop blur',/@media\s*\(max-width:\s*800px\)[\s\S]*?\.app-header\s*\{[^}]*backdrop-filter:\s*none/.test(read('styles/layout.css')));
 check('book uses the unified root manifest',html.includes('href="../../manifest.webmanifest"'));
 check('unified service worker owns only the v2 cache family',readProject('service-worker.js').includes('key.startsWith(CACHE_PREFIX)')&&readProject('service-worker.js').includes('warhammer-rules-unified-v2-'));
-check('PWA cache revision is bumped for the full-content release',readProject('service-worker.js').includes('`${CACHE_PREFIX}v2`'));
-check('book scripts and styles use the current release token',[...cssFiles,...files].every(file=>html.includes('./'+file+'?v=2')));
+check('PWA cache revision is bumped for the navigation rewrite',readProject('service-worker.js').includes('`${CACHE_PREFIX}v3`'));
+check('book scripts and styles use the current release token',[...cssFiles,...files].every(file=>html.includes('./'+file+'?v=3')));
 check('v4 icon is used without legacy v3 PNG references',html.includes('assets/icon-v4.svg')&&!html.includes('icon-180.png'));
 check('navigation and popup specifications are present',['docs/SPEC_NAVIGATION.md','docs/SPEC_POPUPS.md'].every(file=>fs.existsSync(path.join(root,file))));
 
