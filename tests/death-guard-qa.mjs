@@ -95,6 +95,8 @@ try{
     check('behavior: subpixel target at tracking line activates',selected==='child',selected);
     selected='';controller.items=[{id:'glossary',depth:1,glossaryNested:false},{id:'glossary-core',depth:2,glossaryNested:true}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:500},{item:controller.items[1],top:154.5,bottom:300}];controller.readViewport();
     check('behavior: nested Glossary group uses sticky tracking line',selected==='glossary-core',selected);
+    selected='';controller.items=[{id:'glossary',depth:1,glossaryNested:false},{id:'glossary-core',depth:2,glossaryNested:true},{id:'glossary-next',depth:2,glossaryNested:true}];controller.geometry.ranges=[{item:controller.items[0],top:0,bottom:700},{item:controller.items[1],top:100,bottom:145},{item:controller.items[2],top:180,bottom:320}];controller.readViewport();
+    check('behavior: Glossary root does not flash between nested groups',selected==='glossary-core',selected);
   }finally{
     if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;
     if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;

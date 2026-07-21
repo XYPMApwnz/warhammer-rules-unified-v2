@@ -219,6 +219,15 @@
         const line=scrollY+this.geometry.headerBottom+this.trackingGap+this.clearance(range.item);
         if(range.top<=line+this.epsilon&&range.bottom>line&&(!winner||range.item.depth>winner.item.depth||range.item.depth===winner.item.depth&&range.top>winner.top))winner=range;
       }
+      if(winner?.item.id==='glossary'){
+        let glossaryWinner=null;
+        for(const range of this.geometry.ranges){
+          if(!range.item.glossaryNested)continue;
+          const line=scrollY+this.geometry.headerBottom+this.trackingGap+this.clearance(range.item);
+          if(range.top<=line+this.epsilon&&(!glossaryWinner||range.top>glossaryWinner.top))glossaryWinner=range;
+        }
+        if(glossaryWinner)return glossaryWinner.item;
+      }
       if(winner)return winner.item;
       for(const range of this.geometry.ranges){
         const line=scrollY+this.geometry.headerBottom+this.trackingGap+this.clearance(range.item);
