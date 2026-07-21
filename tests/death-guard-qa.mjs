@@ -26,6 +26,8 @@ check('all navigation targets have tracked ranges',navTargets.every(id=>trackTar
 check('navigation has 26 destinations',navTargets.length===26,String(navTargets.length));
 const depths=[...markup.matchAll(/data-nav-depth="(\d+)"/g)].map(match=>Number(match[1]));
 check('navigation depth is at most three',Math.max(...depths)===3);
+const depthThreeLabels=[...markup.matchAll(/<li[^>]+data-nav-depth="3"[^>]*>[\s\S]*?<button class="toc-label"[^>]*>([^<]+)<\/button>[\s\S]*?<\/li>/g)].map(match=>match[1].trim());
+check('leaf navigation uses body titles instead of generic card types',!depthThreeLabels.some(label=>['Detachment Rule','Enhancement','Stratagems'].includes(label)),depthThreeLabels.join(', '));
 check('datasheet local parts are absent from global navigation',['biologus-profile','biologus-abilities','biologus-composition','biologus-keywords','defiler-profile','defiler-abilities','defiler-composition','defiler-keywords'].every(id=>!navTargets.includes(id)));
 
 const dataSource=read('scripts/data.js');
