@@ -16,7 +16,7 @@
   --bronze-bright: #c7ae75;
   --pink: #d5488e;
   --pink-deep: #74143f;
-  --faction-gradient: linear-gradient(90deg, #c8df7f 0 78%, #c3167c 78% 100%);
+  --faction-gradient: linear-gradient(90deg, #c8df7f 0 72%, #c8df7f 74%, #c3167c 82%, #c3167c 100%);
   --line: rgba(216, 209, 191, .14);
   --soft-line: rgba(216, 209, 191, .08);
   --glass: rgba(26, 30, 27, .94);
