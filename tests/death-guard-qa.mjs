@@ -118,6 +118,7 @@ check('Back highlights the restored popup card',journey.includes("trigger?.close
 
 const cssFiles=['styles/tokens.css','styles/layout.css','styles/navigation.css','styles/content.css','styles/popups.css'];
 check('all five style layers are linked',cssFiles.every(file=>html.includes('href="./'+file+'"')));
+check('detachment rule and enhancement stack vertically',/\.detachment-grid\s*\{[^}]*grid-template-columns:\s*1fr/.test(read('styles/content.css')));
 check('no inline style or inline script',!/<style|<script(?![^>]*src=)/i.test(html));
 check('no runtime fetch in document controllers',!files.slice(0,-1).some(file=>/\bfetch\s*\(/.test(read(file))));
 check('book registers the unified root service worker',read('scripts/app.js').includes("register('../../service-worker.js')"));

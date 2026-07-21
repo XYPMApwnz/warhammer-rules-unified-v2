@@ -114,7 +114,9 @@
 .rule-card, .enhancement, .glossary-card { padding: 24px; margin: 16px 0; border-color: rgba(199,174,117,.2); }
 .rule-card:hover, .enhancement:hover, .glossary-card:hover { border-color: rgba(191,213,140,.34); box-shadow: var(--shadow), inset 0 1px rgba(255,255,255,.045), 0 0 30px rgba(125,146,87,.055); }
 .rule-card h3, .enhancement h4, .glossary-card h4 { margin: 0 0 8px; font: 600 24px Georgia, "Times New Roman", serif; }
-.detachment-grid, .glossary-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.detachment-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.detachment-grid > .rule-card, .detachment-grid > .enhancement { margin: 0; }
+.glossary-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
 .stratagem {
   max-width: 680px;
   margin: 24px auto;
@@ -247,7 +249,7 @@
 }
 @media (max-width: 800px) {
   .section:not(.hero) { margin-top: 58px; }
-  .detachment-grid, .glossary-grid { grid-template-columns: 1fr; }
+  .glossary-grid { grid-template-columns: 1fr; }
   .unit-head { flex-wrap: wrap; }
   .points { margin-left: 0; }
   .local-nav { display: grid; grid-template-columns: 1fr 1fr; }
