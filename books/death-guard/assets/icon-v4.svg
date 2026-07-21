@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Death Guard Rules IV</title>
+  <rect width="512" height="512" rx="96" fill="#101a11"/>
+  <rect x="24" y="24" width="464" height="464" rx="76" fill="none" stroke="#b8793c" stroke-width="18"/>
+  <circle cx="256" cy="226" r="142" fill="#1f2b1c" stroke="#c8df7f" stroke-width="10"/>
+  <path d="M165 135h44v184h-44zm72 0h48l43 124 43-124h48l-68 184h-46z" fill="#efe9cf"/>
+  <path d="M138 356h236" stroke="#b8793c" stroke-width="12" stroke-linecap="round"/>
+  <text x="256" y="420" text-anchor="middle" fill="#c8df7f" font-family="Georgia,serif" font-size="58" font-weight="700">DG</text>
+</svg>

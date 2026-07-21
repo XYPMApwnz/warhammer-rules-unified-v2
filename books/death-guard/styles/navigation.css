@@ -1,0 +1,80 @@
+.toc-panel {
+  position: fixed;
+  z-index: 60;
+  inset: calc(var(--header) + env(safe-area-inset-top)) auto 0 0;
+  width: var(--nav);
+  padding: 24px 14px 44px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background:
+    linear-gradient(rgba(183,166,125,.022) 1px, transparent 1px),
+    rgba(13,15,13,.96);
+  background-size: 42px 42px, auto;
+  border-right: 1px solid var(--line);
+  box-shadow: 18px 0 40px rgba(0,0,0,.22);
+  transition: transform .2s ease;
+}
+html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
+.toc-panel[aria-hidden="true"] { visibility: hidden; }
+.toc-heading {
+  margin: 0 8px 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--line);
+  font: 600 26px Georgia, "Times New Roman", serif;
+  letter-spacing: -.025em;
+}
+.toc-heading::before {
+  content: "CODEX REGISTER // XIV";
+  display: block;
+  margin-bottom: 7px;
+  color: var(--pink);
+  font: 800 8px ui-monospace, monospace;
+  letter-spacing: .16em;
+}
+.toc-tree, .toc-branch { list-style: none; margin: 0; padding: 0; }
+.toc-branch { margin-left: 11px; padding-left: 9px; border-left: 1px solid rgba(117,104,73,.52); }
+.toc-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 38px;
+  gap: 2px;
+  margin: 2px 0;
+  border-radius: 0;
+}
+.toc-row.no-toggle { grid-template-columns: 1fr; }
+.toc-label, .toc-toggle {
+  min-height: 42px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.toc-label {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 650;
+}
+.toc-toggle::after {
+  content: "›";
+  display: block;
+  color: var(--green);
+  font-size: 20px;
+  transition: rotate .15s;
+}
+.toc-toggle[aria-expanded="true"]::after { rotate: 90deg; }
+.toc-label:hover, .toc-toggle:hover { background: rgba(113,129,83,.09); color: var(--ink); }
+.toc-label.is-ancestor { color: var(--bronze-bright); }
+.toc-label.is-current {
+  color: var(--green);
+  background: linear-gradient(90deg, rgba(113,129,83,.18), rgba(196,59,127,.06) 68%, transparent);
+  box-shadow: inset 3px 0 var(--green-deep), inset 5px 0 var(--pink);
+}
+body.nav-collapsed .toc-panel { transform: translateX(-102%); }
+.toc-scrim { display: none; }
+@media (max-width: 800px) {
+  .toc-panel { width: min(88vw, 360px); transform: translateX(-105%); box-shadow: 24px 0 52px rgba(0,0,0,.5); }
+  body.nav-drawer-open .toc-panel { transform: translateX(0); }
+  .toc-scrim { position: fixed; z-index: 55; inset: calc(var(--header) + env(safe-area-inset-top)) 0 0; background: rgba(0,0,0,.62); }
+  body.nav-drawer-open .toc-scrim { display: block; }
+}

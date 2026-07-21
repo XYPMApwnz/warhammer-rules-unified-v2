@@ -1,0 +1,7 @@
+{
+  "name": "warhammer-rules-unified",
+  "private": true,
+  "scripts": {
+    "test": "node tests/death-guard-qa.mjs && node tests/integration-qa.mjs"
+  }
+}
