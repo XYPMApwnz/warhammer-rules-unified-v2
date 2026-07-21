@@ -110,6 +110,8 @@ check('popup cards suppress self links',popups.includes('relatedId!==id'));
 check('desktop popup coordinates include document scroll',popups.includes("window.scrollY||0")&&/\.popup-layer\s*\{[^}]*position:\s*absolute/.test(read('styles/popups.css')));
 check('mobile popup layer is fixed',/@media\s*\(max-width:\s*800px\)[\s\S]*?\.popup-layer\s*\{[^}]*position:\s*fixed/.test(read('styles/popups.css')));
 check('popup cards expose dialog semantics',popups.includes("setAttribute('role','dialog')")&&popups.includes("setAttribute('aria-modal','false')"));
+check('unit popups render semantic characteristic grids',popups.includes("card.classList.add('popup-statline')")&&popups.includes("summary=document.createElement('dl')")&&popups.includes("name=document.createElement('dt')")&&popups.includes("score=document.createElement('dd')"));
+check('unit popup grid has a mobile no-overflow layout',/\.popup-stats\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(54px, 1fr\)\)/.test(read('styles/popups.css'))&&/@media\s*\(max-width:\s*480px\)[\s\S]*?\.popup-stats\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/.test(read('styles/popups.css')));
 
 const popupClassSource=popups.match(/(class PopupController\{[\s\S]*?\n  \})\n\n  window\.DGPopups/)?.[1]||'';
 try{

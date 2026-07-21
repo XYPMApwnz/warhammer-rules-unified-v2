@@ -85,7 +85,19 @@
 
       const close=document.createElement('button');close.className='popup-close';close.dataset.popupClose=String(index);close.setAttribute('aria-label','Close '+term.title+' popup');close.textContent='×';
       const title=document.createElement('h3');title.id=titleId;title.textContent=term.title;
-      const summary=document.createElement('p');summary.textContent=term.summary;
+      const statParts=term.summary.split(/\s+·\s+/);
+      const isStatline=statParts.length>=5&&statParts.every(part=>/^(M|T|Sv|W|Ld|OC|Inv)\s+/.test(part));
+      let summary;
+      if(isStatline){
+        card.classList.add('popup-statline');
+        summary=document.createElement('dl');summary.className='popup-stats';summary.setAttribute('aria-label','Unit characteristics');
+        statParts.forEach(part=>{
+          const [label,...value]=part.split(/\s+/),stat=document.createElement('div'),name=document.createElement('dt'),score=document.createElement('dd');
+          stat.className='popup-stat';name.textContent=label;score.textContent=value.join(' ');stat.append(name,score);summary.append(stat);
+        });
+      }else{
+        summary=document.createElement('p');summary.textContent=term.summary;
+      }
       card.append(close,title,summary);
 
       const related=(term.related||[]).filter(relatedId=>relatedId!==id&&this.terms[relatedId]);
@@ -99,7 +111,7 @@
       }
       const actions=this.actionList(term);
       if(actions.length){
-        const group=document.createElement('div');group.className='popup-actions';
+        const group=document.createElement('div');group.className='popup-actions';group.setAttribute('aria-label','Popup destinations');
         actions.forEach((action,actionIndex)=>{
           const button=document.createElement('button');button.className='popup-action';button.dataset.journeyTarget=action.target;button.dataset.journeyType=action.type;button.dataset.actionKey=index+'-'+actionIndex+'-'+action.type+'-'+action.target;button.textContent=action.label;group.append(button);
         });
