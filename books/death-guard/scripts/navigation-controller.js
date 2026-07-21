@@ -136,13 +136,27 @@
       else if(item.bottom>panel.bottom-gap)this.panel.scrollTo({top:this.panel.scrollTop+(item.bottom-panel.bottom+gap),behavior:'smooth'});
     }
 
+    trackingGap(){return 18;}
+    stickyClearance(element){
+      const glossaryTools=element.id!=='glossary'&&element.closest?.('#glossary')?document.querySelector('.glossary-tools'):null;
+      return glossaryTools?.getBoundingClientRect().height||0;
+    }
     destination(element){
-      const glossaryTools=element.closest?.('#glossary')?document.querySelector('.glossary-tools'):null;
-      const stickyClearance=glossaryTools?.getBoundingClientRect().height||0;
-      return Math.max(0,window.scrollY+element.getBoundingClientRect().top-this.header.getBoundingClientRect().height-20-stickyClearance);
+      return Math.max(0,window.scrollY+element.getBoundingClientRect().top-this.header.getBoundingClientRect().height-this.trackingGap()-this.stickyClearance(element));
+    }
+    highlightElement(element){
+      if(element.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem'))return element;
+      const directCard=[...element.children].find(child=>child.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem'));
+      if(directCard)return directCard;
+      return[...element.children].find(child=>/^H[1-6]$/.test(child.tagName))||element;
+    }
+    highlight(element){
+      const target=this.highlightElement(element);if(!target)return;
+      target.classList.remove('destination-highlight');void target.offsetWidth;target.classList.add('destination-highlight');
+      window.setTimeout(()=>target.classList.remove('destination-highlight'),2300);
     }
     go(id){const item=this.byId.get(id);if(!item)return;this.setDrawer(false);this.navigate(id,item.section);}
-    navigate(id,element,settled){this.controlledScroll(id,this.destination(element),settled);}
+    navigate(id,element,settled){this.controlledScroll(id,this.destination(element),()=>{this.highlight(element);if(settled)settled();});}
     restore(id,scrollY,settled){this.controlledScroll(id,Math.max(0,scrollY),settled);}
     controlledScroll(id,destination,settled){
       const token=++this.state.transition;this.state.owner='controller';this.select(id);

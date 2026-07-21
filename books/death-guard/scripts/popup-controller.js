@@ -125,7 +125,10 @@
         card.style.removeProperty('left');card.style.removeProperty('top');card.style.removeProperty('bottom');
         if(mobile){
           const visibleIndex=Math.max(0,index-visibleStart);
-          card.style.left='14px';card.style.bottom='calc('+(14+visibleIndex*24)+'px + env(safe-area-inset-bottom))';return;
+          const margin=14,height=card.offsetHeight;
+          const centered=(window.innerHeight-height)/2+visibleIndex*18;
+          const top=Math.max(headerBottom+margin,Math.min(centered,window.innerHeight-height-margin));
+          card.style.left='14px';card.style.top=Math.round(top)+'px';return;
         }
         const origin=this.resolveOrigin(this.origins[index]),rect=origin?.getBoundingClientRect?.()||this.origins[index]?.rect;
         if(rect&&(rect.bottom<0||rect.top>window.innerHeight)&&previousLeft&&previousTop){card.style.left=previousLeft;card.style.top=previousTop;return;}

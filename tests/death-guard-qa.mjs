@@ -43,7 +43,8 @@ const journey=read('scripts/journey-controller.js');
 check('navigation uses one passive scroll listener',(navigation.match(/addEventListener\('scroll'/g)||[]).length===1&&navigation.includes('{passive:true}'));
 check('navigation avoids :scope',!navigation.includes(':scope'));
 check('navigation has explicit reader/controller ownership',navigation.includes("owner:'reader'")&&navigation.includes("owner='controller'")&&navigation.includes("owner='reader'"));
-check('navigation settles by geometry instead of fixed delay',navigation.includes('stable>=6')&&navigation.includes('Math.abs(current-destination)<2')&&!navigation.includes('setTimeout'));
+check('navigation settles by geometry instead of fixed delay',navigation.includes('stable>=6')&&navigation.includes('Math.abs(current-destination)<2'));
+check('navigation highlights the clicked destination',navigation.includes("classList.add('destination-highlight')")&&navigation.includes('this.highlight(element)'));
 check('mobile breakpoint clears collapsed state',navigation.includes('if(mobile)this.setCollapsed(false)'));
 check('hidden trees use inert and tabindex fallback',navigation.includes('root.inert=!interactive')&&navigation.includes('data-nav-saved-tabindex'));
 const navigationClassSource=navigation.match(/(class NavigationController\{[\s\S]*?\n  \})\n\n  window\.DGNavigation/)?.[1]||'';
@@ -56,7 +57,7 @@ try{
     globalThis.window={scrollY:1000};
     globalThis.document={querySelector:selector=>selector==='.glossary-tools'?{getBoundingClientRect:()=>({height:64})}:null};
     const glossaryTarget={closest:selector=>selector==='#glossary'?{}:null,getBoundingClientRect:()=>({top:200})};
-    check('behavior: glossary destination clears sticky search',controller.destination(glossaryTarget)===1044,String(controller.destination(glossaryTarget)));
+    check('behavior: glossary destination clears sticky search',controller.destination(glossaryTarget)===1046,String(controller.destination(glossaryTarget)));
   }finally{
     if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;
     if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;
@@ -102,7 +103,7 @@ try{
     const mobileCards=Array.from({length:5},()=>makeCard());
     globalThis.window={innerWidth:600,innerHeight:700,scrollX:0,scrollY:0};controller.layer={children:mobileCards};controller.origins=[];
     controller.reposition();
-    check('behavior: mobile rebases the last three visible levels',mobileCards.slice(-3).map(card=>card.style.bottom).join('|')==='calc(14px + env(safe-area-inset-bottom))|calc(38px + env(safe-area-inset-bottom))|calc(62px + env(safe-area-inset-bottom))',mobileCards.slice(-3).map(card=>card.style.bottom).join('|'));
+    check('behavior: mobile centers the last three visible levels',mobileCards.slice(-3).map(card=>card.style.top).join('|')==='260px|278px|296px'&&mobileCards.slice(-3).every(card=>card.style.bottom===''),mobileCards.slice(-3).map(card=>card.style.top).join('|'));
   }finally{
     if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;
     if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;

@@ -43,7 +43,7 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
   width: 54px;
   height: 3px;
   margin-top: 14px;
-  background: linear-gradient(90deg, var(--green) 0 66%, var(--pink) 66%);
+  background: var(--faction-gradient);
   box-shadow: 0 0 14px rgba(125,146,87,.18);
 }
 .toc-heading::before {
@@ -90,7 +90,7 @@ html[data-theme="light"] .toc-panel { background: rgba(231,223,202,.97); }
 .toc-label.is-ancestor { color: var(--bronze-bright); }
 .toc-label.is-current {
   color: var(--green);
-  background: linear-gradient(90deg, rgba(113,129,83,.18), rgba(196,59,127,.06) 68%, transparent);
+  background: linear-gradient(90deg, rgba(191,213,140,.2), rgba(213,72,142,.12) 72%, transparent);
   box-shadow: inset 3px 0 var(--green), inset 6px 0 var(--pink), inset 0 1px rgba(199,174,117,.12), inset 0 -1px rgba(199,174,117,.08);
 }
 body.nav-collapsed .toc-panel { transform: translateX(-102%); }

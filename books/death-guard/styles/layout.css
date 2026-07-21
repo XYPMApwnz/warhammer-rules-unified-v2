@@ -21,7 +21,7 @@
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: linear-gradient(90deg, var(--green-deep) 0 42%, var(--pink) 42% 53%, transparent 53%);
+  background: var(--faction-gradient);
 }
 html[data-theme="light"] .app-header { background: rgba(231, 223, 202, .95); }
 .header-button, .back-button, .library-link {
