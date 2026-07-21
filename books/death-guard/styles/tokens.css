@@ -16,7 +16,7 @@
   --bronze-bright: #c7ae75;
   --pink: #d5488e;
   --pink-deep: #74143f;
-  --faction-gradient: linear-gradient(90deg, var(--green) 0%, var(--green-deep) 58%, var(--pink) 100%);
+  --faction-gradient: linear-gradient(90deg, var(--green) 0 78%, var(--pink) 78% 100%);
   --line: rgba(216, 209, 191, .14);
   --soft-line: rgba(216, 209, 191, .08);
   --glass: rgba(26, 30, 27, .94);
@@ -92,7 +92,7 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
   position: absolute;
   inset: 0 auto 0 0;
   width: 2px;
-  background: var(--faction-gradient);
+  background: linear-gradient(180deg, var(--green-deep), transparent 58%, var(--pink));
   pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {

@@ -18,8 +18,9 @@
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
+  right: auto;
   bottom: -1px;
+  width: min(520px, 62vw);
   height: 2px;
   background: var(--faction-gradient);
 }

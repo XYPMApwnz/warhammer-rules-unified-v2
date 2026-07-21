@@ -60,7 +60,8 @@
         const popupRoot=document.getElementById(record.popupRootId||record.triggerId);
         this.popups.restore(record.popupIds,{root:popupRoot,focus:false});
         const trigger=document.getElementById(record.triggerId)||this.findRestoredAction(record.popupAction);
-        this.highlight(trigger);
+        const restoredPopup=trigger?.closest?.('.term-popup');
+        this.highlight(restoredPopup||trigger);
         if(trigger)trigger.focus({preventScroll:true});else if(record.popupIds.length)this.popups.focusTop();
       });
     }

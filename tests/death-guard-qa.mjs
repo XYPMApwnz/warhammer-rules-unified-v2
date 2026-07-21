@@ -111,8 +111,9 @@ try{
 }catch(error){check('popup behavioral state machine',false,error.message);}
 
 check('Journey captures full popup context',journey.includes('popupIds:this.popups.snapshot()')&&journey.includes('popupRootId')&&journey.includes('popupAction'));
-check('Back restores before highlighting rebuilt action',journey.indexOf('this.popups.restore(record.popupIds')<journey.indexOf('this.highlight(trigger)'));
+check('Back restores before highlighting rebuilt action',journey.indexOf('this.popups.restore(record.popupIds')<journey.indexOf('this.highlight(restoredPopup||trigger)'));
 check('Back has rebuilt-action fallback',journey.includes('this.findRestoredAction(record.popupAction)'));
+check('Back highlights the restored popup card',journey.includes("trigger?.closest?.('.term-popup')")&&journey.includes('this.highlight(restoredPopup||trigger)'));
 
 const cssFiles=['styles/tokens.css','styles/layout.css','styles/navigation.css','styles/content.css','styles/popups.css'];
 check('all five style layers are linked',cssFiles.every(file=>html.includes('href="./'+file+'"')));
