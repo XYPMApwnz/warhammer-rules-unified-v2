@@ -18,5 +18,6 @@
 - Keep touch targets at least 42px.
 - Keep the existing navigation, popup and Journey/Back IDs and data attributes.
 - Cards, tables, controls, tags and popups use square corners.
+- Datasheet statlines keep all seven characteristics (`M`, `T`, `Sv`, `W`, `Ld`, `OC`, `Inv`) in one uninterrupted row.
 - Only CP/status marks may use circular geometry in later iterations.
 - New army books reuse the shared layer and replace only faction signals.

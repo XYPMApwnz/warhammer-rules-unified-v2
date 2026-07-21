@@ -218,7 +218,7 @@
 .unit-part h4 { margin: 0 0 14px; color: var(--green); font: 700 29px Georgia, "Times New Roman", serif; }
 .statline {
   display: grid;
-  grid-template-columns: repeat(6,1fr);
+  grid-template-columns: repeat(7,minmax(0,1fr));
   margin: 18px 0;
   overflow: hidden;
   border: 1px solid var(--line);

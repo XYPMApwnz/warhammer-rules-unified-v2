@@ -163,6 +163,7 @@ check('click navigation highlights only after controlled scroll settles',navigat
 const cssFiles=['styles/tokens.css','styles/layout.css','styles/navigation.css','styles/content.css','styles/popups.css'];
 check('all five style layers are linked',cssFiles.every(file=>html.includes('href="./'+file+'?v=3"')));
 const contentCss=read('styles/content.css');
+check('datasheet statlines keep all seven characteristics on one row',/\.statline\s*\{[^}]*grid-template-columns:\s*repeat\(7,minmax\(0,1fr\)\)/.test(contentCss));
 check('heading destination highlight uses text glow without outline',/\.destination-highlight:is\(h1,h2,h3,h4,h5,h6\)\s*\{[^}]*animation-name:\s*destination-heading-highlight/.test(contentCss)&&contentCss.includes('@keyframes destination-heading-highlight')&&!contentCss.match(/@keyframes destination-heading-highlight[^}]*outline/));
 check('detachment navigation targets render in separate rows',/\.detachment-content\s*\{[^}]*grid-template-columns:\s*1fr/.test(contentCss));
 check('each detachment has a visible Stratagems destination',(markup.match(/class="detachment-part"[^>]*data-track="[^"]+">\s*<h4 class="detachment-part-title">Stratagems<\/h4>/g)||[]).length===bookData.audit.detachments);
