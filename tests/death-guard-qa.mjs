@@ -45,6 +45,7 @@ check('navigation avoids :scope',!navigation.includes(':scope'));
 check('navigation has explicit reader/controller ownership',navigation.includes("owner:'reader'")&&navigation.includes("owner='controller'")&&navigation.includes("owner='reader'"));
 check('navigation settles by geometry instead of fixed delay',navigation.includes('stable>=6')&&navigation.includes('Math.abs(current-destination)<2'));
 check('navigation highlights the clicked destination',navigation.includes("classList.add('destination-highlight')")&&navigation.includes('this.highlight(element)'));
+check('navigation highlight maps one-to-one to its body target',navigation.includes('highlightElement(element){\n      return element;'));
 check('mobile breakpoint clears collapsed state',navigation.includes('if(mobile)this.setCollapsed(false)'));
 check('hidden trees use inert and tabindex fallback',navigation.includes('root.inert=!interactive')&&navigation.includes('data-nav-saved-tabindex'));
 const navigationClassSource=navigation.match(/(class NavigationController\{[\s\S]*?\n  \})\n\n  window\.DGNavigation/)?.[1]||'';

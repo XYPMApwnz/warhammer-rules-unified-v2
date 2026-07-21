@@ -145,10 +145,7 @@
       return Math.max(0,window.scrollY+element.getBoundingClientRect().top-this.header.getBoundingClientRect().height-this.trackingGap()-this.stickyClearance(element));
     }
     highlightElement(element){
-      if(element.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem'))return element;
-      const directCard=[...element.children].find(child=>child.matches?.('.glossary-card,.rule-card,.enhancement,.unit-card,.ability,.stratagem'));
-      if(directCard)return directCard;
-      return[...element.children].find(child=>/^H[1-6]$/.test(child.tagName))||element;
+      return element;
     }
     highlight(element){
       const target=this.highlightElement(element);if(!target)return;

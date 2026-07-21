@@ -233,12 +233,13 @@
 .glossary-card[hidden], .no-results[hidden] { display: none; }
 .destination-highlight { animation: destination-card-highlight 2.3s ease; }
 .destination-highlight:is(h1,h2,h3,h4,h5,h6) { animation-name: destination-heading-highlight; }
+.destination-highlight > :is(.section-title, .category-title) { animation: destination-heading-highlight 2.3s ease; }
 @keyframes destination-card-highlight {
   0%, 100% { outline-color: transparent; filter: none; }
   16%, 72% {
     outline: 3px solid var(--bronze-bright);
     outline-offset: 6px;
-    filter: drop-shadow(0 0 14px rgba(199,174,117,.42)) drop-shadow(0 0 24px rgba(213,72,142,.16));
+    filter: drop-shadow(0 0 14px rgba(199,174,117,.42)) drop-shadow(0 0 24px rgba(191,213,140,.16));
   }
 }
 @keyframes destination-heading-highlight {
